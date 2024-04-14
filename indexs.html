@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: 2rem;
+            width: 100%;
+            height: 100vh;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .outer {
+            width: 250px;
+            height: 170px;
+            border-radius:3rem;
+            background-color: #0043ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .inner{
+            width: 230px;
+            height: 160px;
+            border-radius: 3rem;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .time {
+            color: white;
+            font-size: 1.6rem;
+        }
+       
+        .min{
+            font-size: 2rem;
+        }
+        .sec{
+            font-size: 1.8rem;
+        }
+        .stop-button {
+            width: 250px;
+            margin-top: 65px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .button{
+            width: 70px;
+            height: 40px;
+            border-radius: 10px;
+            border: 2px solid rgb(246, 245, 245);
+            color: rgb(247, 245, 245);
+            background-color: black;
+        }
+        .button:hover{
+            background-color: rgb(216, 243, 244);
+            color: black;
+            box-shadow:-4px 3px 5px  #0043ff;
+        }
+        .lap-item{
+            list-style-type: none;
+            color: rgb(255, 255, 254);
+            font-size: 1rem;
+            margin-top: 2rem;
+            width: 250px;
+            height: 200px;
+            overflow: auto;
+            position: relative;
+            padding: 15px;
+            display: none;
+        }
+        .lab::-webkit-scrollbar{
+            display: none;
+        }
+        .lap-num{
+            width: 100%;
+            text-align: center;
+            display: inline-block;
+            text-align: center;
+            border: 0.1px solid rgb(70, 67, 67);
+            padding: 10px;
+            border-radius: 50px;
+            margin-bottom: 10px;
+        }
+        .num{
+            color: #cccccc;
+        }
+        .time-lap{
+            display: inline-block;
+            margin-left: 15px;
+        }
+        .lap-clear{
+            position: fixed;
+            z-index: 100;
+            display: block;
+            bottom: 35px;
+            left: 50%;
+            width: 130px;
+            padding:10px 0;
+            transform:translate(-50%) ;
+            border-radius: 50px;
+            background-color:rgba(255,255,255,0.9);
+            border: 1px solid white;
+            cursor: pointer;
+        }
+        .hidden{
+            visibility: hidden;
+        }
+        .lap-item {
+            overflow-y: auto;
+            max-height: 150px; /* Adjust height as needed */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="watch">
+            <div class="outer">
+                <div class="inner">
+                   
+                    <span class="time min">00 : </span>
+                    <span class="time sec">00 :</span>
+                    <span class="time msec">01 </span>
+                </div>
+            </div>
+        </div>
+        <div class="stop-button">
+            <button class="button reset hidden">Reset</button>
+            <button class="button play">Play</button>
+            <button class="button lap hidden">Lap</button>
+        </div>
+        <ul class="lap-item">
+        </ul>
+        <button class="lap-clear hidden">
+            Clear All
+        </button>
+        
+    </div>
+
+    <script>
+        
+         const playButton = document.getElementsByClassName("play")[0];
+        const lapButton = document.getElementsByClassName("lap")[0];
+        const resetButton = document.getElementsByClassName("reset")[0];
+        const minute = document.getElementsByClassName("min")[0];
+        const second = document.getElementsByClassName("sec")[0];
+        const centiSecond = document.getElementsByClassName("msec")[0];
+        const laps = document.getElementsByClassName("lap-item")[0];
+        const clearButton = document.getElementsByClassName("lap-clear")[0];
+
+        let isPlay = false;
+        let secCounter = 0;
+        let minCounter = 0;
+        let centiCounter = 0;
+        let minInterval;
+        let secInterval;
+        let centiInterval;
+        let isReset=false;
+        let lapItem=0;
+
+        const toggleButton = () => {
+            lapButton.classList.remove("hidden");
+            resetButton.classList.remove("hidden");
+        };
+
+        const play = () => {
+            if (!isPlay && !isReset) {
+                playButton.innerHTML = 'pause';
+                minInterval = setInterval(() => {
+                    minute.innerText = `${++minCounter}:`;
+                }, 60 * 1000);
+                secInterval = setInterval(() => {
+                    if (secCounter === 60) {
+                        secCounter = 0;
+                    }
+                    second.innerText = ` ${++secCounter}: `;
+                }, 1000);
+                centiInterval = setInterval(() => {
+                    if (centiCounter === 99) {
+                        centiCounter = 0;
+                    }
+                    centiSecond.innerText = ` ${++centiCounter} `;
+                }, 10);
+                isPlay = true;
+                isReset = true;
+            } else {
+                playButton.innerHTML = 'Play';
+                clearInterval(minInterval);
+                clearInterval(secInterval);
+                clearInterval(centiInterval);
+                isPlay = false;
+                isReset = false;
+            }
+            toggleButton();
+        };
+
+        const reset = () => {
+            isReset=true;
+            play();
+            lapButton.classList.add("hidden");
+            resetButton.classList.add("hidden");
+            secCounter = 0;
+            centiCounter = 0;
+            minCounter = 0;
+            second.innerHTML = ' 0:';
+            centiSecond.innerHTML = ' 0';
+            minute.innerHTML = '0:';
+        };
+       
+        const lap = () => {
+            const li = document.createElement("li");
+            const number = document.createElement("span");
+            const timeStamp = document.createElement("span");
+
+            li.setAttribute("class", "lap-num");
+            number.setAttribute("class", "num");
+            timeStamp.setAttribute("class", "time-lap");
+
+            number.innerText = `#${++lapItem}`;
+            timeStamp.innerText = `${minCounter} : ${secCounter} : ${centiCounter}`;
+
+            li.append(number, timeStamp);
+            laps.append(li);
+
+             laps.style.display = "block";
+            clearButton.classList.remove("hidden");
+};
+
+
+        // const clearAll = () => {
+        //     laps.innerHTML='';
+        //     lap.append(clearButton);
+        //     clearButton.classList.add("hidden");
+        // }
+
+        const clearAll = () => {
+    lapItem = 0; // Reset lapItem counter to 0
+    while (laps.firstChild) {
+        laps.removeChild(laps.firstChild);
+    }
+    laps.style.display = "none";
+    clearButton.classList.add("hidden");
+   
+};
+
+        playButton.addEventListener("click", play);
+        resetButton.addEventListener("click", reset);
+        lapButton.addEventListener("click", lap);
+        clearButton.addEventListener("click", clearAll);
+    </script>
+</body>
+
+</html>
