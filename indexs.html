@@ -242,14 +242,8 @@
 };
 
 
-        // const clearAll = () => {
-        //     laps.innerHTML='';
-        //     lap.append(clearButton);
-        //     clearButton.classList.add("hidden");
-        // }
-
         const clearAll = () => {
-    lapItem = 0; // Reset lapItem counter to 0
+    lapItem = 0;
     while (laps.firstChild) {
         laps.removeChild(laps.firstChild);
     }
